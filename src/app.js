@@ -1,14 +1,17 @@
 const express = require("express");
 const { createJob } = require("./monitors/createMonitor");
+const { createClient } = require("redis");
 const app = express();
 const port = 3000;
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   const { q } = req.query;
-  createJob(q);
-  res.send("Hello World!");
+  await createJob(q);
+  res.send("Hello Redis");
 });
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
+

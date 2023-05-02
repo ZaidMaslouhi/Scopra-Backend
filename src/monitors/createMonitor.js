@@ -1,5 +1,7 @@
 const cron = require("node-cron");
+const { v4: uuidv4 } = require("uuid");
 const { default: axios } = require("axios");
+const { default: redisClient } = require("../redisClient");
 
 axios.interceptors.request.use((config) => {
   config.headers["request-startTime"] = process.hrtime();
@@ -14,28 +16,44 @@ axios.interceptors.response.use((response) => {
   return response;
 });
 
-let cronJobs = {};
-
-function createCronJob(job) {
+async function createCronJob(URI) {
   try {
-    const task = cron.schedule("*/5 * * * * *", async () => {
-      const response = await axios.head(`https://${job}`);
-      const duration = response.headers["request-duration"];
-      const cert = response.request.socket.getPeerCertificate();
-      const expirationDate = new Date(cert.valid_to).toLocaleDateString(
-        "en-GB"
-      );
-      console.log(
-        `${job} | Staus: ${response.status} | Response time: ${duration}ms | SSL expiration: ${expirationDate}`
-      );
-    });
+    const taskId = uuidv4();
+    cron.schedule(
+      "*/5 * * * * *",
+      async (manual) => {
+        const response = await axios.head(`https://${URI}`, {
+          validateStatus: false,
+        });
+        const duration = response.headers["request-duration"];
+        const cert = response.request.socket.getPeerCertificate();
 
-    // setTimeout(() => {
-    //   cron.getTasks().get(task.options.name).stop;
-    // }, 20000);
+        const expirationDate =
+          Object.keys(cert).indexOf("valid_to") > -1
+            ? new Date(cert.valid_to).toLocaleDateString("en-GB")
+            : "-";
+        const data = {
+          task: taskId,
+          uri: URI,
+          status: `${response.status} ${response.statusText}`,
+          response: duration,
+          SSLExpiration: expirationDate,
+        };
 
-    // cronJobs[jobId] = task;
+        redisClient.hSet(taskId, Date.now().toString(), JSON.stringify(data));
+        redisClient.publish("monitors", JSON.stringify(data));
+
+        // const mine = await redis.hGetAll(job);
+        // Object.values(mine).forEach((value) => {
+        //   console.log(JSON.parse(value));
+        // });
+      },
+      { name: taskId }
+    );
+
+    // cron.getTasks().get(task.options.name).stop;
   } catch (err) {
+    console.log("Error..");
     console.error(err);
   }
 }
