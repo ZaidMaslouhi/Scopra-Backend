@@ -1,20 +1,20 @@
 const cron = require("node-cron");
 const { v4: uuidv4 } = require("uuid");
-const { default: axios } = require("axios");
+const { Axios } = require("../config");
 const { default: redisClient } = require("../redisClient");
 
-axios.interceptors.request.use((config) => {
-  config.headers["request-startTime"] = process.hrtime();
-  return config;
-});
+// axios.interceptors.request.use((config) => {
+//   config.headers["request-startTime"] = process.hrtime();
+//   return config;
+// });
 
-axios.interceptors.response.use((response) => {
-  const start = response.config.headers["request-startTime"];
-  const end = process.hrtime(start);
-  const milliseconds = Math.round(end[0] * 1000 + end[1] / 1000000);
-  response.headers["request-duration"] = milliseconds;
-  return response;
-});
+// axios.interceptors.response.use((response) => {
+//   const start = response.config.headers["request-startTime"];
+//   const end = process.hrtime(start);
+//   const milliseconds = Math.round(end[0] * 1000 + end[1] / 1000000);
+//   response.headers["request-duration"] = milliseconds;
+//   return response;
+// });
 
 async function createCronJob(URI) {
   try {

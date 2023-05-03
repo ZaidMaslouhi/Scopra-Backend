@@ -2,9 +2,9 @@
   "name": "scopra-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon main",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,6 +12,8 @@
   "dependencies": {
     "@redis/json": "^1.0.4",
     "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "node-cron": "^3.0.2",
     "redis": "^4.6.6",
