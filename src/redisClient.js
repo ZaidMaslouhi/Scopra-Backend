@@ -1,5 +1,5 @@
-const { client, subscriber } = require("../config/redis");
-const { wss } = require("../config/webSocket");
+const { client, subscriber } = require("./config/redis");
+const { wss } = require("./config/webSocket");
 
 // client.on("error", (err) => console.error("Redis Client Error", err));
 // client.on("connect", () => console.log("Redis Client Connected"));
@@ -11,8 +11,8 @@ wss.on("connection", async function connection(ws) {
   console.log(`WS connected.`);
 
   ws.on("message", async (message) => {
-      const monitorsList = JSON.parse(message);
-      userMonitors.push({ connection: ws, monitors: monitorsList });
+    const monitorsList = JSON.parse(message);
+    userMonitors.push({ connection: ws, monitors: monitorsList });
   });
 
   subscriber.subscribe("monitors", (message, channel) => {

@@ -8,15 +8,12 @@ class MonitorService {
     this.repository = new MonitorRepository();
   }
 
-  async getMonitorsByID(monitorIds) {
+  async getMonitorsByUser({ userId }) {
     try {
-      const verifiedMonitors = [];
-      monitorIds.forEach(async (id) => {
-        const monitor = await this.repository.FindById(id);
-        verifiedMonitors.push(monitor);
-      });
+      
+      const monitors = await this.repository.FindByUserId(userId);
 
-      return verifiedMonitors;
+      return monitors;
     } catch (error) {
       console.error(error);
       // throw new APIError('Data Not found')
@@ -56,7 +53,7 @@ class MonitorService {
       SSLExpiration: expirationDate,
     });
 
-    // client.hSet(taskId, Date.now().toString(), JSON.stringify(data));
+    Redis.client.hSet(taskId, Date.now().toString(), JSON.stringify(task));
     Redis.publisher.publish(MONITORS_CHANNEL, JSON.stringify(task));
   };
 
@@ -75,9 +72,22 @@ class MonitorService {
         URI,
       });
 
-      upgradeToWs();
+      // upgradeToWs();
 
       return newMonitor;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateMonitor({ monitor }) {
+    try {
+      const updatedMonitor = this.repository.editMonitor({
+        task: monitor.taskId,
+        name: monitor.name,
+      });
+
+      return updatedMonitor;
     } catch (error) {
       console.error(error);
     }

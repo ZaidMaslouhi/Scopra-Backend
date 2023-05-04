@@ -11,6 +11,10 @@ client.connect((error) => {
   if (error) console.error(error);
   console.log("Client Connected to Redis");
 });
+client.on("connect", (error) => {
+  if (error) console.error(error);
+  console.log("Client Connected to Redis");
+});
 
 const subscriber = createClient({
   socket: {
@@ -22,6 +26,10 @@ subscriber.connect((error) => {
   if (error) console.error(error);
   console.log("Subscriber Connected to Redis");
 });
+subscriber.on("connect", (error) => {
+  if (error) console.error(error);
+  console.log("Subscriber Connected to Redis");
+});
 
 const publisher = createClient({
   socket: {
@@ -30,6 +38,10 @@ const publisher = createClient({
   },
 });
 publisher.connect((error) => {
+  if (error) console.error(error);
+  console.log("Publisher Connected to Redis");
+});
+publisher.on("connect", (error) => {
   if (error) console.error(error);
   console.log("Publisher Connected to Redis");
 });

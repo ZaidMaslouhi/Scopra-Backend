@@ -1,9 +1,11 @@
+const { MonitorModel } = require("../models");
+
 class MonitorRepository {
   async CreateNewMonitor({ taskId, name, uri }) {
     try {
+      MonitorModel.create({ task: taskId, URI: uri });
 
       return { taskId, name, uri };
-
     } catch (error) {
       console.error(error);
       //   throw new APIError(
@@ -56,7 +58,7 @@ class MonitorRepository {
     }
   }
 
-  async FindById(id) {
+  async FindByUserId({ id }) {
     try {
       const ids = id;
       return ids;

@@ -27,28 +27,30 @@ module.exports.stopCronJob = ({ taskId }) => {
   }
 };
 
-const sendMessageInQueue = ({ connection, message }) => {
-  connection.send(message);
-};
-
-const subscribeToQueue = async ({ channel }) => {
+const subscribeToQueue = async ({ channel, connection, monitors }) => {
   try {
-    console.log("Channel: " + channel);
     Redis.subscriber.subscribe(channel, (message) => {
       const obj = JSON.parse(message);
-      console.log("Send Message in the queue");
-      console.log(obj);
-      // sendMessageToQueue({ connection, message });
+      monitors.forEach((monitor) => {
+        if (obj.task === monitor) connection.send(message);
+      });
     });
   } catch (error) {
     console.error(error);
   }
 };
 
-module.exports.upgradeToWs = () => {
+module.exports.openWebSocket = () => {
   try {
     WSS.on("connection", (ws) => {
-      subscribeToQueue({ channel: MONITORS_CHANNEL });
+      ws.on("message", (message) => {
+        const monitors = [...JSON.parse(message.toString())];
+        subscribeToQueue({
+          channel: MONITORS_CHANNEL,
+          connection: ws,
+          monitors,
+        });
+      });
     });
   } catch (error) {
     console.error(error);

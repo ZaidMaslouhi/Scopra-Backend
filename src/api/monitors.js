@@ -1,4 +1,5 @@
 const MonitorService = require("../services/monitor-service");
+const { upgradeToWs } = require("../utils");
 
 module.exports = (app) => {
   const service = new MonitorService();
@@ -11,14 +12,14 @@ module.exports = (app) => {
     }
   });
 
-  // Subscribe to the user's monitors
+  // Get user's monitors
   app.get("/monitors", async (req, res, next) => {
     try {
-      const { monitors } = req.body;
+      const { user } = req.body;
 
-      const verifiedMonitors = await service.getMonitorsByID(monitors);
+      const monitors = await service.getMonitorsByUser({ userId: user.id });
 
-      return res.status(200).json(verifiedMonitors);
+      return res.status(200).json(monitors);
     } catch (error) {
       next(error);
     }
@@ -59,13 +60,9 @@ module.exports = (app) => {
     try {
       const { monitor } = req.body;
 
-      // Some logic
-      // const schuduledMonitors = await service.createMonitor({
-      //   name: monitor.name,
-      //   URI: monitor.uri,
-      // });
+      const updatedMonitor = await service.updateMonitor({ monitor });
 
-      return res.status(200).json(schuduledMonitors);
+      return res.status(200).json(updatedMonitor);
     } catch (error) {
       next(error);
     }
