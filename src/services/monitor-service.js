@@ -1,36 +1,12 @@
 const { v4: uuidv4 } = require("uuid");
 const { Redis, Axios, MONITORS_CHANNEL } = require("../config");
-const { createCronJob, stopCronJob, upgradeToWs } = require("../utils");
+const { createCronJob, stopCronJob } = require("../utils");
 const MonitorRepository = require("../database/repository/monitor-repository");
+const { ProjectModel } = require("../database/models");
 
 class MonitorService {
   constructor() {
     this.repository = new MonitorRepository();
-  }
-
-  async getMonitorsByUser({ userId }) {
-    try {
-      
-      const monitors = await this.repository.FindByUserId(userId);
-
-      return monitors;
-    } catch (error) {
-      console.error(error);
-      // throw new APIError('Data Not found')
-    }
-  }
-
-  async stopMonitor({ id }) {
-    try {
-      // const monitor = await this.repository.FindById(id);
-
-      const stoppedTask = stopCronJob({ taskId: id });
-
-      return stoppedTask;
-    } catch (error) {
-      console.error(error);
-      // throw new APIError('Data Not found')
-    }
   }
 
   monitorScheduledTask = async (taskId, URI) => {
@@ -57,34 +33,49 @@ class MonitorService {
     Redis.publisher.publish(MONITORS_CHANNEL, JSON.stringify(task));
   };
 
-  async createMonitor({ name, URI }) {
+  async createMonitor({ name, uri }) {
     try {
-      const taskId = uuidv4();
+      // const taskId = uuidv4();
+      const taskId = "683713ae-7526-4113-a2c2-8827461ee427";
 
       createCronJob({
         taskId,
-        scheduledTask: () => this.monitorScheduledTask(taskId, URI),
+        scheduledTask: () => this.monitorScheduledTask(taskId, uri),
       });
 
-      const newMonitor = this.repository.CreateNewMonitor({
+      const newMonitor = await this.repository.CreateNewMonitor({
         taskId,
-        name,
-        URI,
+        uri,
       });
 
-      // upgradeToWs();
+      const addToProject = await this.repository.addMonitorToProject({
+        projectId: "6454e3b50b402cbb6bc42099",
+        monitor: newMonitor._id,
+        name,
+      });
 
-      return newMonitor;
+      return { project: addToProject, monitor: newMonitor };
     } catch (error) {
       console.error(error);
     }
   }
 
-  async updateMonitor({ monitor }) {
+  async getMonitorsByUserId({ userId }) {
     try {
-      const updatedMonitor = this.repository.editMonitor({
-        task: monitor.taskId,
-        name: monitor.name,
+      const monitors = await this.repository.FindMonitorsByUserId({ userId });
+
+      return monitors;
+    } catch (error) {
+      console.error(error);
+      // throw new APIError('Data Not found')
+    }
+  }
+
+  async updateMonitor({ project, monitor }) {
+    try {
+      const updatedMonitor = this.repository.updateProjectMonitor({
+        project: project,
+        monitor: monitor,
       });
 
       return updatedMonitor;
@@ -92,6 +83,36 @@ class MonitorService {
       console.error(error);
     }
   }
+
+  async UnsubscribeMonitor({ projectId, monitorId }) {
+    try {
+      // const stoppedTask = stopCronJob({ taskId: id });
+      const deletedMonitor = this.repository.DeleteMonitorFromProject({
+        projectId,
+        monitorId,
+      });
+
+      return deletedMonitor;
+    } catch (error) {
+      console.error(error);
+      // throw new APIError('Data Not found')
+    }
+  }
+
+  // async createReponse() {
+  //   try {
+  //     const response = this.repository.addResponse({
+  //       monitor: newMonitor,
+  //       status: 200,
+  //       duration: 80,
+  //       ssl: "05/05/2022",
+  //     });
+
+  //     return response;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 }
 
 module.exports = MonitorService;

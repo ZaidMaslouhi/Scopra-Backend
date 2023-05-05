@@ -1,14 +1,18 @@
 const mongoose = require("mongoose");
 
 const monitorSchema = new mongoose.Schema({
-  task: {
+  taskId: {
     type: String,
     required: true,
   },
-  URI: String,
-  status: String,
-  responseTime: String,
-  ssl: String,
+  uri: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model("monitor", monitorSchema);
+module.exports = mongoose.model("Monitor", monitorSchema);

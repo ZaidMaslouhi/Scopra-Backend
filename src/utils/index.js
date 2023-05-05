@@ -7,7 +7,9 @@ module.exports.createCronJob = ({
   cronExpression = "*/5 * * * * *",
 }) => {
   try {
-    cron.schedule(cronExpression, () => scheduledTask(), { name: taskId });
+    cron.schedule(cronExpression, () => scheduledTask(), {
+      name: taskId,
+    });
 
     return taskId;
   } catch (error) {

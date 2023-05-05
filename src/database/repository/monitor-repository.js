@@ -1,11 +1,18 @@
-const { MonitorModel } = require("../models");
+const { default: mongoose } = require("mongoose");
+const ObjectId = require("mongoose").Types.ObjectId;
+const {
+  MonitorModel,
+  ProjectModel,
+  UserModel,
+  ResponseModel,
+} = require("../models");
 
 class MonitorRepository {
-  async CreateNewMonitor({ taskId, name, uri }) {
+  async CreateNewMonitor({ taskId, uri }) {
     try {
-      MonitorModel.create({ task: taskId, URI: uri });
+      const newMonitor = MonitorModel.create({ taskId, uri });
 
-      return { taskId, name, uri };
+      return newMonitor;
     } catch (error) {
       console.error(error);
       //   throw new APIError(
@@ -16,10 +23,78 @@ class MonitorRepository {
     }
   }
 
-  async updateMonitor({ taskId, name, sslExpiry }) {
+  async addMonitorToProject({ projectId, monitor, name }) {
     try {
-      const ids = id;
-      return ids;
+      const project = await ProjectModel.findById(projectId).exec();
+
+      const updatedProject = await ProjectModel.updateOne(
+        { _id: project._id },
+        {
+          $push: {
+            monitors: { name, monitor: monitor },
+          },
+        }
+      );
+
+      return updatedProject;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async FindMonitorsByUserId({ userId }) {
+    try {
+      const user = await UserModel.findById(userId)
+        .populate({
+          path: "projects",
+          populate: { path: "monitors.monitor", model: "Monitor" },
+        })
+        .exec();
+
+      const monitors = user.projects.map((project) => project.monitors);
+
+      return monitors;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateProjectMonitor({ project, monitor }) {
+    try {
+      const projectMonitors = await ProjectModel.updateOne(
+        {
+          _id: project.id,
+          "monitors.monitor": monitor.id,
+        },
+        {
+          $set: {
+            "monitors.$.name": monitor.name,
+          },
+        }
+      );
+
+      console.log(projectMonitors);
+
+      return projectMonitors;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async DeleteMonitorFromProject({ projectId, monitorId }) {
+    try {
+      const deletedMonitor = await ProjectModel.updateOne(
+        {
+          _id: projectId,
+          "monitors.monitor": monitorId,
+        },
+        {
+          $pull: {
+            monitors: { monitor: monitorId },
+          },
+        }
+      );
+      return deletedMonitor;
     } catch (error) {
       console.error(error);
       //   throw new APIError(
@@ -30,47 +105,25 @@ class MonitorRepository {
     }
   }
 
-  async addToMonitor({ taskId, status, duration }) {
-    try {
-      const ids = id;
-      return ids;
-    } catch (error) {
-      console.error(error);
-      //   throw new APIError(
-      //     "API Error",
-      //     STATUS_CODES.INTERNAL_ERROR,
-      //     "Unable to Find Product"
-      //   );
-    }
-  }
+  // async addResponse({ monitor, status, duration, ssl }) {
+  //   try {
+  //     const response = await ResponseModel.create({
+  //       monitorId: monitor._id,
+  //       responseStatus: status,
+  //       responseDuration: duration,
+  //       sslExpirationDate: ssl,
+  //     });
 
-  async DeleteMonitor({ taskId }) {
-    try {
-      const ids = id;
-      return ids;
-    } catch (error) {
-      console.error(error);
-      //   throw new APIError(
-      //     "API Error",
-      //     STATUS_CODES.INTERNAL_ERROR,
-      //     "Unable to Find Product"
-      //   );
-    }
-  }
-
-  async FindByUserId({ id }) {
-    try {
-      const ids = id;
-      return ids;
-    } catch (error) {
-      console.error(error);
-      //   throw new APIError(
-      //     "API Error",
-      //     STATUS_CODES.INTERNAL_ERROR,
-      //     "Unable to Find Product"
-      //   );
-    }
-  }
+  //     return response;
+  //   } catch (error) {
+  //     console.error(error);
+  //     //   throw new APIError(
+  //     //     "API Error",
+  //     //     STATUS_CODES.INTERNAL_ERROR,
+  //     //     "Unable to Find Product"
+  //     //   );
+  //   }
+  // }
 }
 
 module.exports = MonitorRepository;
