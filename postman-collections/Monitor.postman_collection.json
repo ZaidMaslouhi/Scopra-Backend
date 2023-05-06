@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "18f06354-bc2d-481d-8518-ebe3bf9cb733",
+		"name": "Monitor",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8000/monitors",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\": {\r\n        \"id\": \"64561d72535f6d501534ade6\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/monitors",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"monitors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/monitor",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"monitor\": {\r\n        \"name\": \"Google\",\r\n        \"uri\": \"https://www.google.com/\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/monitor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"monitor"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/monitor",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"project\": {\r\n        \"id\": \"64561d3a535f6d501534ade5\"\r\n    },\r\n    \"monitor\": {\r\n        \"id\": \"64561e4d131dee465e8aab1a\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/monitor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"monitor"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/monitor",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"project\": {\r\n        \"id\": \"64561d3a535f6d501534ade5\"\r\n    },\r\n    \"monitor\": {\r\n        \"id\": \"64561ee0131dee465e8aab20\",\r\n        \"name\": \"Youtube\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/monitor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"monitor"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

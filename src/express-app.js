@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const monitors = require("./api/monitors");
+const { users, projects, monitors } = require("./api");
 
 module.exports = async (app) => {
   //Middlewares
@@ -10,6 +10,8 @@ module.exports = async (app) => {
   app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
   //Api
+  users(app);
+  projects(app);
   monitors(app);
 
   //Error

@@ -11,8 +11,8 @@ module.exports = {
   // App variables
   APP_SECRET: process.env.APP_SECRET,
   PORT: process.env.PORT || 3000,
-  // DataBase
-  DB_URL: process.env.DB_URL,
+  // DataBase URI
+  DB_URI: process.env.DB_URI,
   // Redis
   REDIS_HOST: process.env.REDIS_HOST || "localhost",
   REDIS_PORT: process.env.REDIS_PORT || 6379,

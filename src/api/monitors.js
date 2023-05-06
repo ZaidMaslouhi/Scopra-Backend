@@ -1,4 +1,4 @@
-const MonitorService = require("../services/monitor-service");
+const { MonitorService } = require("../services");
 
 module.exports = (app) => {
   const service = new MonitorService();

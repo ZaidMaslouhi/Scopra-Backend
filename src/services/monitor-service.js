@@ -1,8 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { Redis, Axios, MONITORS_CHANNEL } = require("../config");
 const { createCronJob, stopCronJob } = require("../utils");
-const MonitorRepository = require("../database/repository/monitor-repository");
-const { ProjectModel } = require("../database/models");
+const {MonitorRepository} = require("../database/repository");
 
 class MonitorService {
   constructor() {
@@ -49,7 +48,7 @@ class MonitorService {
       });
 
       const addToProject = await this.repository.addMonitorToProject({
-        projectId: "6454e3b50b402cbb6bc42099",
+        projectId: "64561d3a535f6d501534ade5",
         monitor: newMonitor._id,
         name,
       });
