@@ -1,9 +1,10 @@
+const verifyJWT = require("../middleware/verifyJWT");
 const { MonitorService } = require("../services");
 
 module.exports = (app) => {
   const service = new MonitorService();
 
-  app.get("/", (req, res, next) => {
+  app.get("/", verifyJWT, (req, res, next) => {
     try {
       res.status(200).send("Working good...");
     } catch (error) {
@@ -12,7 +13,7 @@ module.exports = (app) => {
   });
 
   // Get user's monitors
-  app.get("/monitors", async (req, res, next) => {
+  app.get("/monitors", verifyJWT, async (req, res, next) => {
     try {
       const { user } = req.body;
 
@@ -25,7 +26,7 @@ module.exports = (app) => {
   });
 
   // Add/Subscribe monitor
-  app.post("/monitor", async (req, res, next) => {
+  app.post("/monitor", verifyJWT, async (req, res, next) => {
     try {
       const { monitor } = req.body;
 
@@ -41,7 +42,7 @@ module.exports = (app) => {
   });
 
   // Update Monitor
-  app.put("/monitor", async (req, res, next) => {
+  app.put("/monitor", verifyJWT, async (req, res, next) => {
     try {
       const { project, monitor } = req.body;
 
@@ -54,7 +55,7 @@ module.exports = (app) => {
   });
 
   // Delete/Unsubscribe Monitor
-  app.delete("/monitor", async (req, res, next) => {
+  app.delete("/monitor", verifyJWT, async (req, res, next) => {
     try {
       const { project, monitor } = req.body;
 

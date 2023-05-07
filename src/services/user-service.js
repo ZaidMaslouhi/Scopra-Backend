@@ -1,5 +1,7 @@
 const { UserRepository } = require("../database/repository");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } = require("../config");
 
 class UserService {
   constructor() {
@@ -13,9 +15,31 @@ class UserService {
       });
 
       if (!loggedUser) return null;
-      const match = await bcrypt.compare(user.password, loggedUser.password);
 
-      return match ? loggedUser : null;
+      const match = await bcrypt.compare(user.password, loggedUser.password);
+      if (match) {
+        const accessToken = jwt.sign(
+          { user: loggedUser._id },
+          ACCESS_TOKEN_KEY,
+          {
+            expiresIn: "30min",
+          }
+        );
+        const refreshToken = jwt.sign(
+          { user: loggedUser._id },
+          REFRESH_TOKEN_KEY,
+          {
+            expiresIn: "1d",
+          }
+        );
+        loggedUser.token = refreshToken;
+        const user = await this.repository.UpdateUserToken({
+          user: loggedUser,
+        });
+        return { user, refreshToken, accessToken };
+      }
+
+      return null;
     } catch (error) {
       console.log(error);
     }
@@ -39,9 +63,9 @@ class UserService {
     }
   }
 
-  async updateUser({ user }) {
+  async updateUserToken({ user }) {
     try {
-      const updatedUser = this.repository.UpdateUser({ user });
+      const updatedUser = this.repository.UpdateUserToken({ user });
 
       return updatedUser;
     } catch (error) {
@@ -58,6 +82,16 @@ class UserService {
     } catch (error) {
       console.error(error);
       // throw new APIError('Data Not found')
+    }
+  }
+
+  async findUserByToken(token) {
+    try {
+      const user = this.repository.FindUserByToken(token);
+
+      return user;
+    } catch (error) {
+      console.error(error);
     }
   }
 }

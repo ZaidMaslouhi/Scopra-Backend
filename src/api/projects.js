@@ -1,10 +1,11 @@
+const verifyJWT = require("../middleware/verifyJWT");
 const { ProjectService } = require("../services");
 
 module.exports = (app) => {
   const service = new ProjectService();
 
   // Get user's projects
-  app.get("/project", async (req, res, next) => {
+  app.get("/project", verifyJWT, async (req, res, next) => {
     try {
       const { user } = req.body;
 
@@ -17,7 +18,7 @@ module.exports = (app) => {
   });
 
   // Add new project
-  app.post("/project", async (req, res, next) => {
+  app.post("/project", verifyJWT, async (req, res, next) => {
     try {
       const { user, project } = req.body;
 
@@ -35,7 +36,7 @@ module.exports = (app) => {
   });
 
   // Update project
-  app.put("/project", async (req, res, next) => {
+  app.put("/project", verifyJWT, async (req, res, next) => {
     try {
       const { project } = req.body;
 
@@ -48,7 +49,7 @@ module.exports = (app) => {
   });
 
   // Delete project
-  app.delete("/project", async (req, res, next) => {
+  app.delete("/project", verifyJWT, async (req, res, next) => {
     try {
       const { user, project } = req.body;
 

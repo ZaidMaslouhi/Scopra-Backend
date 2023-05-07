@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  token: {
+    type: String,
+    default: "",
+  },
   projects: [
     {
       type: mongoose.Schema.Types.ObjectId,

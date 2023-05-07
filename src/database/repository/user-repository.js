@@ -3,9 +3,19 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const { UserModel } = require("../models");
 
 class UserRepository {
-  async LoginUser({ email, password }) {
+  async LoginUser({ email }) {
     try {
       const user = await UserModel.findOne({ email }).exec();
+
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async FindUserByToken(token) {
+    try {
+      const user = await UserModel.findOne({ token }).exec();
 
       return user;
     } catch (error) {
@@ -32,17 +42,12 @@ class UserRepository {
     }
   }
 
-  async UpdateUser({ user }) {
+  async UpdateUserToken({ user }) {
     try {
-      let userInfo = await UserModel.findById(user.id);
-      userInfo = { ...user };
-
-      const updatedUser = await UserModel.updateOne(
+      const updatedUser = await UserModel.findByIdAndUpdate(
         { _id: user.id },
-        {
-          ...userInfo,
-        }
-      );
+        { token: user.token }
+      ).exec();
 
       return updatedUser;
     } catch (error) {
