@@ -63,7 +63,11 @@ module.exports = (app) => {
       const refreshToken = cookies.jwt;
       const user = await service.findUserByToken(refreshToken);
       if (!user) {
-        res.clearCookie("jwt", { httpOnly: true });
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+        });
         return res.sendStatus(204);
       }
 
@@ -71,7 +75,11 @@ module.exports = (app) => {
         user: { id: user._id, token: "" },
       });
 
-      res.clearCookie("jwt", { httpOnly: true });
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
       res.sendStatus(204);
     } catch (error) {
       next(error);
