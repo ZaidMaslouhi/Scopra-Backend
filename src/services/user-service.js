@@ -17,29 +17,24 @@ class UserService {
       if (!loggedUser) return null;
 
       const match = await bcrypt.compare(user.password, loggedUser.password);
-      if (match) {
-        const accessToken = jwt.sign(
-          { user: loggedUser._id },
-          ACCESS_TOKEN_KEY,
-          {
-            expiresIn: "30min",
-          }
-        );
-        const refreshToken = jwt.sign(
-          { user: loggedUser._id },
-          REFRESH_TOKEN_KEY,
-          {
-            expiresIn: "1d",
-          }
-        );
-        loggedUser.token = refreshToken;
-        const user = await this.repository.UpdateUserToken({
-          user: loggedUser,
-        });
-        return { user, refreshToken, accessToken };
-      }
+      if (!match) return null;
 
-      return null;
+      const accessToken = jwt.sign({ user: loggedUser._id }, ACCESS_TOKEN_KEY, {
+        expiresIn: "30min",
+      });
+      const refreshToken = jwt.sign(
+        { user: loggedUser._id },
+        REFRESH_TOKEN_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
+      loggedUser.token = refreshToken;
+      const user = await this.repository.UpdateUserToken({
+        user: loggedUser,
+      });
+      return { user, refreshToken, accessToken };
+      
     } catch (error) {
       console.log(error);
     }

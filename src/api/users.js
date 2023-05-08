@@ -1,6 +1,8 @@
 const { UserService } = require("../services");
 const jwt = require("jsonwebtoken");
 const { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } = require("../config");
+const passport = require("passport");
+const { UserModel } = require("../database/models");
 
 module.exports = (app) => {
   const service = new UserService();
@@ -86,19 +88,6 @@ module.exports = (app) => {
     }
   });
 
-  // Update user
-  // app.put("/user", async (req, res, next) => {
-  //   try {
-  //     const { user } = req.body;
-
-  //     const updatedUser = await service.updateUser({ user });
-
-  //     return res.status(200).json(updatedUser);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // });
-
   // Refresh Token
   app.get("/refresh", async (req, res, next) => {
     const cookies = req.cookies;
@@ -118,14 +107,78 @@ module.exports = (app) => {
     });
   });
 
-  // Oauth
-  // app.get("/Oauth", async (req, res, next) => {
-  //   try {
-  //     // const deletedProject = await service.deleteProject({ user, project });
+  // Google auth
+  app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
+  app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    async (req, res) => {
+      // Redirect or return JWT token
 
-  //     return res.status(200).json({});
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // });
+      const userId = req.user.toString();
+
+      const accessToken = jwt.sign({ user: userId }, ACCESS_TOKEN_KEY, {
+        expiresIn: "30min",
+      });
+      const refreshToken = jwt.sign({ user: userId }, REFRESH_TOKEN_KEY, {
+        expiresIn: "1d",
+      });
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: "None",
+      });
+
+      await UserModel.findByIdAndUpdate(
+        { _id: userId },
+        { token: refreshToken }
+      ).exec();
+
+      res.status(201).json({ accessToken });
+    }
+  );
+
+  // GitHub auth
+  app.get(
+    "/auth/github",
+    passport.authenticate("github", { scope: ["user:email"] })
+  );
+  app.get(
+    "/auth/github/callback",
+    passport.authenticate("github", { failureRedirect: "/login" }),
+    async (req, res) => {
+      // Redirect or return JWT token
+
+       console.log(req.user);
+
+      const userId = req.user._id;
+
+      
+       console.log(userId);
+       
+       const accessToken = jwt.sign({ user: userId }, ACCESS_TOKEN_KEY, {
+        expiresIn: "30min",
+      });
+      const refreshToken = jwt.sign({ user: userId }, REFRESH_TOKEN_KEY, {
+        expiresIn: "1d",
+      });
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: "None",
+      });
+
+      await UserModel.findByIdAndUpdate(
+        { _id: userId },
+        { token: refreshToken }
+      ).exec();
+
+      res.status(201).json({ accessToken });
+    }
+  );
 };

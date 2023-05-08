@@ -14,6 +14,14 @@ module.exports = {
   // JWT
   REFRESH_TOKEN_KEY: process.env.REFRESH_TOKEN_KEY,
   ACCESS_TOKEN_KEY: process.env.ACCESS_TOKEN_KEY,
+  // Google auth
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
+  // Github auth
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+  GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
   // DataBase
   DB_URI: process.env.DB_URI,
   // Redis

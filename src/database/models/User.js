@@ -7,11 +7,11 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "email required"],
+    unique: [true, "email already registered"],
   },
   password: {
     type: String,
-    required: true,
   },
   photoUrl: {
     type: String,
@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     default: "",
+  },
+  source: {
+    type: String,
+    required: [true, "source not specified"],
   },
   token: {
     type: String,
